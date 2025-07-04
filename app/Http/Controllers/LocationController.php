@@ -26,22 +26,40 @@ class LocationController extends Controller
         //  Database ya log me save karna
         Log::info("Location: $lat, $lng");
         
-        $apiKey = env('OPENCAGE_API_KEY');
+        // $apiKey = env('OPENCAGE_API_KEY');
         
-        $response = Http::get("https://api.opencagedata.com/geocode/v1/json", [
-            'q' => "$lat+$lng",
-            'key' => $apiKey,
+        // $response = Http::get("https://api.opencagedata.com/geocode/v1/json", [
+        //     'q' => "$lat+$lng",
+        //     'key' => $apiKey,
+        // ]);
+
+        // Call to Nominatim API
+
+        $url = "https://nominatim.openstreetmap.org/reverse";
+        $response = Http::withHeaders([
+            'User-Agent' => 'LaravelApp/1.0'
+        ])->get($url, [
+            'format' => 'json',
+            'lat' => $lat,
+            'lon' => $lng,
         ]);
 
-        $data = $response->json();
-        $address = $data['results'][0]['formatted'] ?? 'Address not found';
+        if($response->successful()) {
+            $data = $response->json();
+            // $address = $data['results'][0]['formatted'] ?? 'Address not found';
+            $address = $data['address'] ?? [];
 
-        Log::info("User Address: " . $address);
+            Log::info("User Address: " . $address);
 
-        // return response()->json(['success' => true]);
+            // return response()->json(['success' => true]);
 
-        // return response(null, 204);
+            // return response(null, 204);
 
-        return response()->json(['address' => $address]);
+            return response()->json([
+                'full_address' => $data['display_name'] ?? '',
+                'address' => $address
+            ]);
+        }
+        return response()->json(['error' => 'Unable to fetch location'], 500);
     }
 }
