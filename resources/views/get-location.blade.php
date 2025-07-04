@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Get User Location</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
@@ -25,10 +26,12 @@
                     $.ajax({
                         url: "/get-address", // Laravel route
                         method: "POST",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
                         data: {
                             lat: lat,
                             lng: lng,
-                            _token: '{{ csrf_token() }}' // Only for Laravel
                         },
                         dataType:'json',
                         success: function (res) {
