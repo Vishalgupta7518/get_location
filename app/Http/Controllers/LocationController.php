@@ -49,7 +49,8 @@ class LocationController extends Controller
             // $address = $data['results'][0]['formatted'] ?? 'Address not found';
             $address = $data['address'] ?? [];
 
-            Log::info("User Address: " . $address);
+            // Log::info("User Address: " . $address);
+            Log::info("User Address: " . json_encode($address));
 
             // return response()->json(['success' => true]);
 
